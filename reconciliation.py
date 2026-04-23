@@ -5,7 +5,7 @@ import io
 import os
 import requests
 import pandas as pd
-from azure.storage.fileshare import ShareFileClient
+from azure.storage.blob import BlobClient
 
 AUTH = (os.environ.get('API_AUTH_USER', 'brandon-svc'), os.environ['API_AUTH_PASSWORD'])
 
@@ -117,10 +117,10 @@ reconciliation_df.to_csv(csv_buffer, index=False)
 csv_bytes = csv_buffer.getvalue()
 
 conn_str = os.environ['AZURE_STORAGE_CONNECTION_STRING']
-file_client = ShareFileClient.from_connection_string(
+blob_client = BlobClient.from_connection_string(
     conn_str,
-    share_name='backlog',
-    file_path='reconciliation.csv',
+    container_name='backlog',
+    blob_name='reconciliation.csv',
 )
-file_client.upload_file(csv_bytes)
+blob_client.upload_blob(csv_bytes, overwrite=True)
 print("Uploaded reconciliation.csv to tkcdatalake/backlog/")
